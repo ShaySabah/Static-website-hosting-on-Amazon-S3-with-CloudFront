@@ -1,0 +1,120 @@
+terraform {
+    required_providers {
+        aws = {
+            source = "hashicorp/aws"
+            version = "~> 3.0"
+        }
+    }
+}
+
+provider "aws" {
+    region = "us-east-1"
+}
+
+resource "aws_route53_zone" "Route53HostedZone" {
+    name = "mystaticwebsiteproject.com."
+}
+
+resource "aws_acm_certificate" "CertificateManagerCertificate" {
+    domain_name = "mystaticwebsiteproject.com"
+    subject_alternative_names = [
+        "mystaticwebsiteproject.com",
+        "*.mystaticwebsiteproject.com"
+    ]
+    validation_method = "DNS"
+}
+
+resource "aws_s3_bucket" "S3Bucket" {
+    bucket = "s3bucket.mystaticwebsiteproject.com"
+}
+
+resource "aws_cloudfront_distribution" "CloudFrontDistribution" {
+    origin {
+        domain_name = "s3bucket.mystaticwebsiteproject.com.s3.us-east-1.amazonaws.com"
+        origin_id = "s3bucket.mystaticwebsiteproject.com.s3.us-east-1.amazonaws.com"
+        
+        origin_path = ""
+        s3_origin_config {
+            origin_access_identity = "origin-access-identity/cloudfront/EYMF5AY3A2H1G"
+        }
+    }
+    default_cache_behavior {
+        allowed_methods = [
+            "HEAD",
+            "GET"
+        ]
+        compress = true
+        smooth_streaming  = false
+        target_origin_id = "s3bucket.mystaticwebsiteproject.com.s3.us-east-1.amazonaws.com"
+        viewer_protocol_policy = "allow-all"
+    }
+    comment = ""
+    price_class = "PriceClass_All"
+    enabled = true
+    viewer_certificate {
+        cloudfront_default_certificate = true
+        minimum_protocol_version = "TLSv1"
+        ssl_support_method = "vip"
+    }
+    restrictions {
+        geo_restriction {
+            restriction_type = "none"
+        }
+    }
+    http_version = "http2"
+    is_ipv6_enabled = true
+}
+
+resource "aws_route53_record" "Route53RecordSet" {
+    name = "mystaticwebsiteproject.com."
+    type = "A"
+    alias {
+        name = "d1l0n7a7sa3z83.cloudfront.net."
+        zone_id = "Z2FDTNDATAQYW2"
+        evaluate_target_health = false
+    }
+    zone_id = "Z077380023VZ9FHZW9EN7"
+}
+
+resource "aws_route53_record" "Route53RecordSet2" {
+    name = "mystaticwebsiteproject.com."
+    type = "NS"
+    ttl = 172800
+    records = [
+        "ns-55.awsdns-06.com.",
+        "ns-939.awsdns-53.net.",
+        "ns-1444.awsdns-52.org.",
+        "ns-1885.awsdns-43.co.uk."
+    ]
+    zone_id = "Z077380023VZ9FHZW9EN7"
+}
+
+resource "aws_route53_record" "Route53RecordSet3" {
+    name = "mystaticwebsiteproject.com."
+    type = "SOA"
+    ttl = 900
+    records = [
+        "ns-55.awsdns-06.com. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+    ]
+    zone_id = "Z077380023VZ9FHZW9EN7"
+}
+
+resource "aws_route53_record" "Route53RecordSet4" {
+    name = "_1227722484017e62bdbb386c97e6e360.mystaticwebsiteproject.com."
+    type = "CNAME"
+    ttl = 300
+    records = [
+        "_d9b79f3c72c3662312e4a89ea1ebeca7.tctnwhlsjt.acm-validations.aws."
+    ]
+    zone_id = "Z077380023VZ9FHZW9EN7"
+}
+
+resource "aws_route53_record" "Route53RecordSet5" {
+    name = "s3bucket.mystaticwebsiteproject.com."
+    type = "CNAME"
+    ttl = 300
+    records = [
+        "mystaticwebsiteproject.com"
+    ]
+    zone_id = "Z077380023VZ9FHZW9EN7"
+}

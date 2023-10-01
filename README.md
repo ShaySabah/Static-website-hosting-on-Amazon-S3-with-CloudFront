@@ -30,3 +30,4 @@ Configures DNS records in Route 53 for your domain:
 - NS and SOA records for authoritative nameservers.
 - A CNAME record for ACM certificate validation.
 - A CNAME record for routing to the S3 bucket.
+![Architecture](https://github.com/ShaySabah/Static-website-hosting-on-Amazon-S3-with-CloudFront/assets/139687184/6460dddb-1387-4e10-9f40-a3ea3a4597a5)
